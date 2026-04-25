@@ -17,6 +17,7 @@ const (
 	Signature = "PACK"
 
 	// VersionSupported is the packfile format version this package supports.
+	// Git has used version 2 since 2005; version 3 does not exist in the wild.
 	VersionSupported uint32 = 2
 
 	// HeaderSize is the size of the packfile header in bytes.
@@ -28,12 +29,12 @@ const (
 type ObjectType int8
 
 const (
-	ObjectCommit    ObjectType = 1
-	ObjectTree      ObjectType = 2
-	ObjectBlob      ObjectType = 3
-	ObjectTag       ObjectType = 4
-	ObjectOfsDelta  ObjectType = 6
-	ObjectRefDelta  ObjectType = 7
+	ObjectCommit   ObjectType = 1
+	ObjectTree     ObjectType = 2
+	ObjectBlob     ObjectType = 3
+	ObjectTag      ObjectType = 4
+	ObjectOfsDelta ObjectType = 6
+	ObjectRefDelta ObjectType = 7
 )
 
 // String returns a human-readable name for the object type.
@@ -54,6 +55,16 @@ func (t ObjectType) String() string {
 	default:
 		return fmt.Sprintf("unknown(%d)", int(t))
 	}
+}
+
+// IsBase returns true if the object type is a non-delta (base) object.
+func (t ObjectType) IsBase() bool {
+	return t == ObjectCommit || t == ObjectTree || t == ObjectBlob || t == ObjectTag
+}
+
+// IsDelta returns true if the object type is a delta object.
+func (t ObjectType) IsDelta() bool {
+	return t == ObjectOfsDelta || t == ObjectRefDelta
 }
 
 // Header represents the header of a packfile.
@@ -110,9 +121,4 @@ type ObjectHeader struct {
 }
 
 // Checksum computes the SHA-1 checksum over all bytes written to buf,
-// appending the 20-byte digest and returning the complete packfile bytes.
-func Checksum(buf *bytes.Buffer) []byte {
-	h := hash.New(hash.CryptoType)
-	_, _ = h.Write(buf.Bytes())
-	return h.Sum(buf.Bytes())
-}
+// appending the 20-byte digest and returning the complete packfil
