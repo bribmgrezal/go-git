@@ -76,6 +76,7 @@ type Header struct {
 
 // Validate checks that the header contains expected magic bytes and a supported version.
 // Note: git itself is lenient about version checks, but we strictly require v2 here.
+// TODO: Consider relaxing version check to support potential future versions (e.g. allow >= 2).
 func (h *Header) Validate() error {
 	if string(h.Signature[:]) != Signature {
 		return fmt.Errorf("invalid packfile signature: %q (expected %q)", h.Signature, Signature)
@@ -108,7 +109,4 @@ func WriteHeader(w io.Writer, objectCount uint32) error {
 	return binary.Write(w, binary.BigEndian, hdr)
 }
 
-// ObjectHeader holds metadata about a single packed object entry.
-type ObjectHeader struct {
-	Type   ObjectType
-	Length uint64 // uncompressed size of the object data
+// ObjectHeader hold
