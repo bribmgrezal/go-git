@@ -100,13 +100,10 @@ func ReadHeader(r io.Reader) (*Header, error) {
 }
 
 // WriteHeader serialises the packfile header to w.
+// The signature bytes are copied from the Signature constant to ensure correctness.
 func WriteHeader(w io.Writer, objectCount uint32) error {
 	hdr := Header{
 		Version:   VersionSupported,
 		ObjectNum: objectCount,
 	}
-	copy(hdr.Signature[:], Signature)
-	return binary.Write(w, binary.BigEndian, hdr)
-}
-
-// ObjectHeader hold
+	copy(hd
