@@ -101,9 +101,7 @@ func ReadHeader(r io.Reader) (*Header, error) {
 
 // WriteHeader serialises the packfile header to w.
 // The signature bytes are copied from the Signature constant to ensure correctness.
+// objectCount must accurately reflect the number of objects that will follow in
+// the packfile; git will reject packs where the count does not match the actual
+// number of objects present.
 func WriteHeader(w io.Writer, objectCount uint32) error {
-	hdr := Header{
-		Version:   VersionSupported,
-		ObjectNum: objectCount,
-	}
-	copy(hd
